@@ -1,0 +1,32 @@
+{
+  "name": "freezy-bee/nette-caching-psr6",
+  "type": "library",
+  "description": "PSR-6 Bridge for Nette Caching",
+  "keywords": [
+    "nette",
+    "freezy-bee",
+    "psr-6",
+    "cache"
+  ],
+  "homepage": "http://freezybee.ifire.cz",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jakub Janata",
+      "email": "jakubjanata@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "nette/caching": "^2.3",
+    "psr/cache": "^1.0"
+  },
+  "require-dev": {
+    "nette/tester": ">=1.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "FreezyBee\\NetteCachingPsr6\\": "src/"
+    }
+  }
+}
