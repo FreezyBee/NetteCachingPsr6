@@ -1,6 +1,9 @@
 FreezyBee/NetteCachingPsr6
 ==========================
 
+[![Build Status](https://travis-ci.org/FreezyBee/NetteCachingPsr6.svg?branch=master)](https://travis-ci.org/FreezyBee/NetteCachingPsr6)
+[![Coverage Status](https://coveralls.io/repos/github/FreezyBee/NetteCachingPsr6/badge.svg?branch=master)](https://coveralls.io/github/FreezyBee/NetteCachingPsr6?branch=master)
+
 PSR-6 Bridge for Nette Caching.
 
 
