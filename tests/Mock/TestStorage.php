@@ -45,6 +45,7 @@ class TestStorage implements IStorage
      */
     public function remove($key)
     {
+        unset($this->data[$key]);
     }
 
     /**
@@ -52,6 +53,7 @@ class TestStorage implements IStorage
      */
     public function clean(array $conditions)
     {
+        $this->data = [];
     }
 
     /**

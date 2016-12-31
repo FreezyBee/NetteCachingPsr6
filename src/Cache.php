@@ -53,16 +53,12 @@ class Cache implements CacheItemPoolInterface
         );
     }
 
-
     /**
-     * {@inheritdoc}
+     * @param string $key
+     * @return CacheItem
      */
     public function getItem($key)
     {
-        if ($this->deferred) {
-            $this->commit();
-        }
-
         self::validateKey($key);
 
         $value = $this->nCache->load($key);
@@ -72,7 +68,8 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string[] $keys
+     * @return CacheItem[]|array|\Traversable
      */
     public function getItems(array $keys = [])
     {
@@ -92,7 +89,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function hasItem($key)
     {
@@ -100,17 +97,18 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function clear()
     {
         $this->deferred = [];
-        $this->nCache->clean(NCache::ALL);
+        $this->nCache->clean([NCache::ALL]);
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $key
+     * @return bool
      */
     public function deleteItem($key)
     {
@@ -118,7 +116,8 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string[] $keys
+     * @return bool
      */
     public function deleteItems(array $keys)
     {
@@ -135,7 +134,8 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param CacheItem|CacheItemInterface $item
+     * @return bool
      */
     public function save(CacheItemInterface $item)
     {
@@ -148,7 +148,8 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param CacheItemInterface|CacheItem $item
+     * @return bool
      */
     public function saveDeferred(CacheItemInterface $item)
     {
@@ -161,7 +162,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function commit()
     {
@@ -172,9 +173,11 @@ class Cache implements CacheItemPoolInterface
         return true;
     }
 
+    /**
+     *
+     */
     public function __destruct()
     {
-        var_dump('__desctruct');
         if ($this->deferred) {
             $this->commit();
         }
