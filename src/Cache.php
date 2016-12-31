@@ -6,39 +6,42 @@
  * For the full copyright and license information, please view the LICENSE file.
  */
 
+declare(strict_types=1);
+
 namespace FreezyBee\NetteCachingPsr6;
 
+use Closure;
 use FreezyBee\NetteCachingPsr6\Exception\InvalidArgumentException;
 use Nette\Caching\IStorage;
-use Nette\Caching\Cache as NCache;
+use Nette\Caching\Cache as NetteCache;
+use Nette\InvalidArgumentException as NetteArgumentException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * Class Cache
- * @package FreezyBee\NetteCachingPsr6
  * @author Jakub Janata <jakubjanata@gmail.com>
  */
 class Cache implements CacheItemPoolInterface
 {
-    /** @var NCache */
-    protected $nCache;
+    /** @var NetteCache */
+    protected $netteCache;
 
     /** @var CacheItem[] */
     protected $deferred;
 
-    /** @var \Closure */
+    /** @var Closure */
     protected $createCacheItem;
 
     /**
      * @param IStorage $storage
+     *
      * @param string $namespace
      */
-    public function __construct(IStorage $storage, $namespace = NULL)
+    public function __construct(IStorage $storage, string $namespace = null)
     {
-        $this->nCache = new NCache($storage, $namespace);
+        $this->netteCache = new NetteCache($storage, $namespace);
 
-        $this->createCacheItem = \Closure::bind(
+        $this->createCacheItem = Closure::bind(
             function (string $key, $value, bool $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
@@ -55,21 +58,28 @@ class Cache implements CacheItemPoolInterface
 
     /**
      * @param string $key
+     *
      * @return CacheItem
+     *
+     * @throws InvalidArgumentException
      */
     public function getItem($key)
     {
         self::validateKey($key);
 
-        $value = $this->nCache->load($key);
+        $value = $this->netteCache->load($key);
 
         $f = $this->createCacheItem;
+
         return $f($key, $value, $value !== null);
     }
 
     /**
      * @param string[] $keys
+     *
      * @return CacheItem[]|array|\Traversable
+     *
+     * @throws InvalidArgumentException
      */
     public function getItems(array $keys = [])
     {
@@ -78,7 +88,7 @@ class Cache implements CacheItemPoolInterface
         }
 
         $items = [];
-        $rawItems = $this->nCache->bulkLoad($keys);
+        $rawItems = $this->netteCache->bulkLoad($keys);
         $f = $this->createCacheItem;
 
         foreach ($rawItems as $key => $value) {
@@ -90,9 +100,12 @@ class Cache implements CacheItemPoolInterface
 
     /**
      * @param string $key
+     *
      * @return bool
+     *
+     * @throws InvalidArgumentException
      */
-    public function hasItem($key)
+    public function hasItem($key): bool
     {
         return $this->getItem($key)->isHit();
     }
@@ -103,13 +116,16 @@ class Cache implements CacheItemPoolInterface
     public function clear()
     {
         $this->deferred = [];
-        $this->nCache->clean([NCache::ALL]);
+        $this->netteCache->clean([NetteCache::ALL]);
         return true;
     }
 
     /**
      * @param string $key
+     *
      * @return bool
+     *
+     * @throws InvalidArgumentException
      */
     public function deleteItem($key)
     {
@@ -118,9 +134,12 @@ class Cache implements CacheItemPoolInterface
 
     /**
      * @param string[] $keys
+     *
      * @return bool
+     *
+     * @throws InvalidArgumentException
      */
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys): bool
     {
         foreach ($keys as $key) {
             self::validateKey($key);
@@ -128,7 +147,7 @@ class Cache implements CacheItemPoolInterface
 
         foreach ($keys as $key) {
             unset($this->deferred[$key]);
-            $this->nCache->remove($key);
+            $this->netteCache->remove($key);
         }
 
         return true;
@@ -136,9 +155,12 @@ class Cache implements CacheItemPoolInterface
 
     /**
      * @param CacheItem|CacheItemInterface $item
+     *
      * @return bool
+     *
+     * @throws NetteArgumentException
      */
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
         if (!$item instanceof CacheItem) {
             return false;
@@ -150,9 +172,10 @@ class Cache implements CacheItemPoolInterface
 
     /**
      * @param CacheItemInterface|CacheItem $item
+     *
      * @return bool
      */
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item): bool
     {
         if (!$item instanceof CacheItem) {
             return false;
@@ -164,18 +187,20 @@ class Cache implements CacheItemPoolInterface
 
     /**
      * @return bool
+     *
+     * @throws NetteArgumentException
      */
-    public function commit()
+    public function commit(): bool
     {
         foreach ($this->deferred as $item) {
-            $this->nCache->save($item->getKey(), $item->get(), [NCache::EXPIRE => $item->getExpiry()]);
+            $this->netteCache->save($item->getKey(), $item->get(), [NetteCache::EXPIRE => $item->getExpiry()]);
         }
 
         return true;
     }
 
     /**
-     *
+     * @throws NetteArgumentException
      */
     public function __destruct()
     {
@@ -186,7 +211,9 @@ class Cache implements CacheItemPoolInterface
 
     /**
      * Validates a cache key according to PSR-6.
-     * @param string $key The key to validate
+     *
+     * @param mixed $key The key to validate
+     *
      * @throws InvalidArgumentException When $key is not valid.
      */
     public static function validateKey($key)

@@ -8,11 +8,12 @@
 
 namespace FreezyBee\NetteCachingPsr6\Exception;
 
+use Psr\Cache\InvalidArgumentException as PsrCacheArgumentException;
+
 /**
- * Class InvalidArgumentException
- * @package FreezyBee\NetteCachingPsr6
  * @author Jakub Janata <jakubjanata@gmail.com>
  */
-class InvalidArgumentException extends CacheException implements \Psr\Cache\InvalidArgumentException
+class InvalidArgumentException extends CacheException implements PsrCacheArgumentException
 {
+
 }
