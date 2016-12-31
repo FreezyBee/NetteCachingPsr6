@@ -89,6 +89,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
+     * @param string $key
      * @return bool
      */
     public function hasItem($key)

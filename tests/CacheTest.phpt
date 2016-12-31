@@ -1,8 +1,16 @@
 <?php
 
+/*
+ * This file is part of the some package.
+ * (c) Jakub Janata <jakubjanata@gmail.com>
+ * For the full copyright and license information, please view the LICENSE file.
+ */
+
+namespace FreezyBee\NetteCachingPsr6\Tests;
+
 use FreezyBee\NetteCachingPsr6\Cache;
 use FreezyBee\NetteCachingPsr6\Exception\InvalidArgumentException;
-use FreezyBee\NetteCachingPsr6\Tests\TestStorage;
+use Psr\Cache\CacheItemInterface;
 use Tester\Assert;
 use Tester\TestCase;
 
@@ -48,6 +56,7 @@ class CacheTest extends TestCase
         $item = $cache->getItem('key2');
         Assert::true($item->isHit());
         Assert::same('defaultX', $item->get());
+        Assert::true($cache->hasItem('key2'));
     }
 
     /**
@@ -127,7 +136,7 @@ class CacheTest extends TestCase
         $cache = new Cache($this->storage);
 
         $data = [
-            'key1' => new stdClass,
+            'key1' => new \stdClass,
             'key2' => [true, 1, 'jj@gmail.com', 3.14]
         ];
 
@@ -159,6 +168,41 @@ class CacheTest extends TestCase
         Assert::equal([], $this->storage->getData());
     }
 
+    public function testInvalidSave()
+    {
+        $cache = new Cache($this->storage);
+
+        $item = new class implements CacheItemInterface
+        {
+            public function getKey()
+            {
+            }
+
+            public function get()
+            {
+            }
+
+            public function isHit()
+            {
+            }
+
+            public function set($value)
+            {
+            }
+
+            public function expiresAt($expiration)
+            {
+            }
+
+            public function expiresAfter($time)
+            {
+            }
+        };
+
+        Assert::false($cache->save($item));
+        Assert::false($cache->saveDeferred($item));
+    }
+
     /**
      *
      */
@@ -170,7 +214,11 @@ class CacheTest extends TestCase
         }, InvalidArgumentException::class);
 
         Assert::exception(function () use ($cache) {
-            $cache->getItems([(object) ['hello']]);
+            $cache->getItems([(object)['hello']]);
+        }, InvalidArgumentException::class);
+
+        Assert::exception(function () use ($cache) {
+            $cache->getItem('');
         }, InvalidArgumentException::class);
 
         Assert::exception(function () use ($cache) {
