@@ -6,8 +6,11 @@
  * For the full copyright and license information, please view the LICENSE file.
  */
 
+declare(strict_types=1);
+
 namespace FreezyBee\NetteCachingPsr6;
 
+use DateTimeInterface;
 use FreezyBee\NetteCachingPsr6\Exception\InvalidArgumentException;
 use Psr\Cache\CacheItemInterface;
 
@@ -17,25 +20,35 @@ use Psr\Cache\CacheItemInterface;
  */
 class CacheItem implements CacheItemInterface
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $key;
 
-    /** @var mixed */
+    /**
+     * @var mixed
+     */
     protected $value;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $isHit;
 
-    /** @var int */
+    /**
+     * @var null|int
+     */
     protected $expiry;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $defaultLifetime;
 
     /**
      * {@inheritdoc}
      */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
@@ -51,7 +64,7 @@ class CacheItem implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function isHit()
+    public function isHit(): bool
     {
         return $this->isHit;
     }
@@ -59,7 +72,7 @@ class CacheItem implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function set($value)
+    public function set($value): CacheItemInterface
     {
         $this->value = $value;
         return $this;
@@ -67,13 +80,15 @@ class CacheItem implements CacheItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws InvalidArgumentException
      */
-    public function expiresAt($expiration)
+    public function expiresAt($expiration): CacheItemInterface
     {
-        if (null === $expiration) {
+        if ($expiration === null) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
-        } elseif ($expiration instanceof \DateTimeInterface) {
-            $this->expiry = (int)$expiration->format('U');
+        } elseif ($expiration instanceof DateTimeInterface) {
+            $this->expiry = (int) $expiration->format('U');
         } else {
             throw new InvalidArgumentException(sprintf(
                 'Expiration date must implement DateTimeInterface or be null, "%s" given',
@@ -86,8 +101,10 @@ class CacheItem implements CacheItemInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws InvalidArgumentException
      */
-    public function expiresAfter($time)
+    public function expiresAfter($time): CacheItemInterface
     {
         if (null === $time) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
@@ -106,7 +123,7 @@ class CacheItem implements CacheItemInterface
     }
 
     /**
-     * @return int
+     * @return null|int
      */
     public function getExpiry()
     {

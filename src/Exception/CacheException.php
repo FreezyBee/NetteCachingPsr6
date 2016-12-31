@@ -8,11 +8,13 @@
 
 namespace FreezyBee\NetteCachingPsr6\Exception;
 
+use Exception;
+use Psr\Cache\CacheException as PsrCacheException;
+
 /**
- * Class CacheException
- * @package FreezyBee\NetteCachingPsr6
  * @author Jakub Janata <jakubjanata@gmail.com>
  */
-class CacheException extends \Exception implements \Psr\Cache\CacheException
+class CacheException extends Exception implements PsrCacheException
 {
+
 }
