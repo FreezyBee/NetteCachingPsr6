@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE file.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FreezyBee\NetteCachingPsr6;
 
@@ -109,7 +109,7 @@ class CacheItem implements CacheItemInterface
         if (null === $time) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($time instanceof \DateInterval) {
-            $this->expiry = (int)\DateTime::createFromFormat('U', time())->add($time)->format('U');
+            $this->expiry = (int) \DateTime::createFromFormat('U', time())->add($time)->format('U');
         } elseif (is_int($time)) {
             $this->expiry = $time + time();
         } else {

@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE file.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace FreezyBee\NetteCachingPsr6;
 
