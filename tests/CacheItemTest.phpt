@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the some package.
@@ -14,7 +15,6 @@ use Tester\Assert;
 use Tester\TestCase;
 
 require __DIR__ . '/bootstrap.php';
-require __DIR__ . '/Mock/TestStorage.php';
 
 /**
  * Class CacheItemTest

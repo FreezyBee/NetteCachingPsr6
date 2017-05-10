@@ -1,13 +1,12 @@
 <?php
+declare(strict_types=1);
 
-namespace FreezyBee\NetteCachingPsr6\Tests;
-
-use Nette\Caching\IStorage;
+namespace FreezyBee\NetteCachingPsr6\Tests\Mock;
 
 /**
  * Class TestStorage
  */
-class TestStorage implements IStorage
+class TestStorage2 implements ITestStorage
 {
     /**
      * @var array
@@ -20,7 +19,7 @@ class TestStorage implements IStorage
      */
     public function read($key)
     {
-        return isset($this->data[$key]) ? $this->data[$key] : null;
+        return $this->data[$key] ?? null;
     }
 
     /**
@@ -59,7 +58,7 @@ class TestStorage implements IStorage
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }

@@ -63,7 +63,7 @@ class Cache implements CacheItemPoolInterface
      *
      * @throws InvalidArgumentException
      */
-    public function getItem($key)
+    public function getItem($key): CacheItem
     {
         self::validateKey($key);
 
@@ -113,7 +113,7 @@ class Cache implements CacheItemPoolInterface
     /**
      * @return bool
      */
-    public function clear()
+    public function clear(): bool
     {
         $this->deferred = [];
         $this->netteCache->clean([NetteCache::ALL]);
@@ -127,7 +127,7 @@ class Cache implements CacheItemPoolInterface
      *
      * @throws InvalidArgumentException
      */
-    public function deleteItem($key)
+    public function deleteItem($key): bool
     {
         return $this->deleteItems([$key]);
     }

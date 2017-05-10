@@ -1,20 +1,27 @@
 language: php
 
-sudo: false
-
 cache:
     directories:
         - vendor
         - $HOME/.composer/cache
 
 php:
-    - 7.0
+    - 7.1
+
+env:
+    - NETTE_CACHE="^2.3"
+    - NETTE_CACHE="^3.0.0-beta"
+
+install:
+    - composer install --no-interaction --prefer-source
+    - composer require nette/caching:${NETTE_CACHE} --no-interaction --prefer-source
 
 install:
     - composer install
 
 script:
-    - php vendor/bin/phpcs --standard=vendor/squizlabs/php_codesniffer/CodeSniffer/Standards/PSR2/ruleset.xml ./src ./tests
+    - php vendor/bin/phpstan analyze ./src -l 5
+    - php vendor/bin/phpcs --standard=PSR2 ./src ./tests
     - php vendor/bin/tester tests -p phpdbg --coverage ./coverage.xml --coverage-src ./src
 
 after_script:

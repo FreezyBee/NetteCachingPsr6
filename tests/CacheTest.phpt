@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the some package.
@@ -10,12 +11,15 @@ namespace FreezyBee\NetteCachingPsr6\Tests;
 
 use FreezyBee\NetteCachingPsr6\Cache;
 use FreezyBee\NetteCachingPsr6\Exception\InvalidArgumentException;
+use FreezyBee\NetteCachingPsr6\Tests\Mock\ITestStorage;
+use FreezyBee\NetteCachingPsr6\Tests\Mock\TestStorage2;
+use FreezyBee\NetteCachingPsr6\Tests\Mock\TestStorage3;
+use Nette\Caching\IStorage;
 use Psr\Cache\CacheItemInterface;
 use Tester\Assert;
 use Tester\TestCase;
 
 require __DIR__ . '/bootstrap.php';
-require __DIR__ . '/Mock/TestStorage.php';
 
 /**
  * Class CacheTest
@@ -24,7 +28,7 @@ require __DIR__ . '/Mock/TestStorage.php';
 class CacheTest extends TestCase
 {
     /**
-     * @var TestStorage
+     * @var ITestStorage
      */
     protected $storage;
 
@@ -33,7 +37,10 @@ class CacheTest extends TestCase
      */
     public function setUp()
     {
-        $this->storage = new TestStorage;
+        // detect version of nette istorage
+        $this->storage = (new \ReflectionMethod(IStorage::class, 'read'))->getParameters()[0]->hasType() ?
+            new TestStorage3 :
+            new TestStorage2;
     }
 
     /**
@@ -214,7 +221,7 @@ class CacheTest extends TestCase
         }, InvalidArgumentException::class);
 
         Assert::exception(function () use ($cache) {
-            $cache->getItems([(object)['hello']]);
+            $cache->getItems([(object) ['hello']]);
         }, InvalidArgumentException::class);
 
         Assert::exception(function () use ($cache) {
@@ -229,7 +236,7 @@ class CacheTest extends TestCase
     /**
      * @return array
      */
-    private function getDefaultDataArray()
+    private function getDefaultDataArray(): array
     {
         return [chr(0) . '78f825aaa0103319aaa1a30bf4fe3ada' => 'defaultX'];
     }
