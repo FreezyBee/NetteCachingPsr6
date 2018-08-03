@@ -34,7 +34,6 @@ class Cache implements CacheItemPoolInterface
 
     /**
      * @param IStorage $storage
-     *
      * @param string $namespace
      */
     public function __construct(IStorage $storage, string $namespace = null)
@@ -57,11 +56,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * @param string $key
-     *
-     * @return CacheItem
-     *
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function getItem($key): CacheItem
     {
@@ -75,11 +70,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * @param string[] $keys
-     *
-     * @return CacheItem[]|array|\Traversable
-     *
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function getItems(array $keys = [])
     {
@@ -99,11 +90,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * @param string $key
-     *
-     * @return bool
-     *
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function hasItem($key): bool
     {
@@ -111,7 +98,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function clear(): bool
     {
@@ -121,11 +108,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * @param string $key
-     *
-     * @return bool
-     *
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function deleteItem($key): bool
     {
@@ -133,11 +116,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * @param string[] $keys
-     *
-     * @return bool
-     *
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function deleteItems(array $keys): bool
     {
@@ -154,11 +133,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * @param CacheItem|CacheItemInterface $item
-     *
-     * @return bool
-     *
-     * @throws NetteArgumentException
+     * {@inheritdoc}
      */
     public function save(CacheItemInterface $item): bool
     {
@@ -171,9 +146,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * @param CacheItemInterface|CacheItem $item
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function saveDeferred(CacheItemInterface $item): bool
     {
@@ -186,9 +159,7 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * @return bool
-     *
-     * @throws NetteArgumentException
+     * {@inheritdoc}
      */
     public function commit(): bool
     {
@@ -211,12 +182,10 @@ class Cache implements CacheItemPoolInterface
 
     /**
      * Validates a cache key according to PSR-6.
-     *
      * @param mixed $key The key to validate
-     *
      * @throws InvalidArgumentException When $key is not valid.
      */
-    public static function validateKey($key)
+    public static function validateKey($key): void
     {
         if (!is_string($key)) {
             throw new InvalidArgumentException(sprintf(

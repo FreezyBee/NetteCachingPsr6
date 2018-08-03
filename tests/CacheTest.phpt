@@ -35,7 +35,7 @@ class CacheTest extends TestCase
     /**
      *
      */
-    public function setUp()
+    public function setUp(): void
     {
         // detect version of nette istorage
         $this->storage = (new \ReflectionMethod(IStorage::class, 'read'))->getParameters()[0]->hasType() ?
@@ -46,7 +46,7 @@ class CacheTest extends TestCase
     /**
      *
      */
-    public function testUnsuccessGetItem()
+    public function testUnsuccessGetItem(): void
     {
         $cache = new Cache($this->storage);
         $item = $cache->getItem('key1');
@@ -69,7 +69,7 @@ class CacheTest extends TestCase
     /**
      *
      */
-    public function testSimpleSave()
+    public function testSimpleSave(): void
     {
         $cache = new Cache($this->storage);
         $item = $cache->getItem('key2');
@@ -81,7 +81,7 @@ class CacheTest extends TestCase
     /**
      *
      */
-    public function testDestructSave()
+    public function testDestructSave(): void
     {
         $cache = new Cache($this->storage);
         $item = $cache->getItem('key2');
@@ -94,7 +94,7 @@ class CacheTest extends TestCase
     /**
      *
      */
-    public function testNoSave()
+    public function testNoSave(): void
     {
         $cache = new Cache($this->storage);
         $item = $cache->getItem('key2');
@@ -106,7 +106,7 @@ class CacheTest extends TestCase
     /**
      *
      */
-    public function testSaveAndGetFromAnotherInstance()
+    public function testSaveAndGetFromAnotherInstance(): void
     {
         $cache = new Cache($this->storage);
         $item = $cache->getItem('key1');
@@ -122,7 +122,7 @@ class CacheTest extends TestCase
     /**
      *
      */
-    public function testDeleteItem()
+    public function testDeleteItem(): void
     {
         $this->storage->setData($this->getDefaultDataArray());
         $cache = new Cache($this->storage);
@@ -138,7 +138,7 @@ class CacheTest extends TestCase
     /**
      *
      */
-    public function testGetAndDeleteItems()
+    public function testGetAndDeleteItems(): void
     {
         $cache = new Cache($this->storage);
 
@@ -175,7 +175,7 @@ class CacheTest extends TestCase
         Assert::equal([], $this->storage->getData());
     }
 
-    public function testInvalidSave()
+    public function testInvalidSave(): void
     {
         $cache = new Cache($this->storage);
 
@@ -213,7 +213,7 @@ class CacheTest extends TestCase
     /**
      *
      */
-    public function testException()
+    public function testException(): void
     {
         $cache = new Cache($this->storage);
         Assert::exception(function () use ($cache) {

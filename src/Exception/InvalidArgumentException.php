@@ -16,5 +16,4 @@ use Psr\Cache\InvalidArgumentException as PsrCacheArgumentException;
  */
 class InvalidArgumentException extends CacheException implements PsrCacheArgumentException
 {
-
 }

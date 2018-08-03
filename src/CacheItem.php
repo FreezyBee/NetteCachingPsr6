@@ -20,29 +20,19 @@ use Psr\Cache\CacheItemInterface;
  */
 class CacheItem implements CacheItemInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $key;
 
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     protected $value;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $isHit;
 
-    /**
-     * @var null|int
-     */
+    /** @var null|int */
     protected $expiry;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $defaultLifetime;
 
     /**
@@ -80,7 +70,6 @@ class CacheItem implements CacheItemInterface
 
     /**
      * {@inheritdoc}
-     *
      * @throws InvalidArgumentException
      */
     public function expiresAt($expiration): CacheItemInterface
@@ -101,7 +90,6 @@ class CacheItem implements CacheItemInterface
 
     /**
      * {@inheritdoc}
-     *
      * @throws InvalidArgumentException
      */
     public function expiresAfter($time): CacheItemInterface
@@ -109,7 +97,11 @@ class CacheItem implements CacheItemInterface
         if (null === $time) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($time instanceof \DateInterval) {
-            $this->expiry = (int) \DateTime::createFromFormat('U', time())->add($time)->format('U');
+            $date = \DateTime::createFromFormat('U', (string) time());
+            if ($date === false) {
+                throw new InvalidArgumentException('Invalid time');
+            }
+            $this->expiry = (int) $date->add($time)->format('U');
         } elseif (is_int($time)) {
             $this->expiry = $time + time();
         } else {
@@ -123,9 +115,9 @@ class CacheItem implements CacheItemInterface
     }
 
     /**
-     * @return null|int
+     * @return int|null
      */
-    public function getExpiry()
+    public function getExpiry(): ?int
     {
         return $this->expiry;
     }

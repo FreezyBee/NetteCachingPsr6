@@ -30,7 +30,7 @@ class CacheItemTest extends TestCase
     /**
      *
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->item = new class extends CacheItem
         {
@@ -45,7 +45,7 @@ class CacheItemTest extends TestCase
     /**
      *
      */
-    public function testGetters()
+    public function testGetters(): void
     {
         $item = $this->item;
         Assert::same('key', $item->getKey());
@@ -57,7 +57,7 @@ class CacheItemTest extends TestCase
     /**
      *
      */
-    public function testSetters()
+    public function testSetters(): void
     {
         $item = $this->item;
         $value = (object)['x' => 'y'];
@@ -76,7 +76,7 @@ class CacheItemTest extends TestCase
     /**
      *
      */
-    public function testExceptions()
+    public function testExceptions(): void
     {
         $item = $this->item;
         Assert::exception(function () use ($item) {
