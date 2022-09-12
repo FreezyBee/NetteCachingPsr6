@@ -11,10 +11,7 @@ namespace FreezyBee\NetteCachingPsr6\Tests;
 
 use FreezyBee\NetteCachingPsr6\Cache;
 use FreezyBee\NetteCachingPsr6\Exception\InvalidArgumentException;
-use FreezyBee\NetteCachingPsr6\Tests\Mock\ITestStorage;
-use FreezyBee\NetteCachingPsr6\Tests\Mock\TestStorage2;
-use FreezyBee\NetteCachingPsr6\Tests\Mock\TestStorage3;
-use Nette\Caching\IStorage;
+use FreezyBee\NetteCachingPsr6\Tests\Mock\MockStorage;
 use Psr\Cache\CacheItemInterface;
 use Tester\Assert;
 use Tester\TestCase;
@@ -27,20 +24,14 @@ require __DIR__ . '/bootstrap.php';
  */
 class CacheTest extends TestCase
 {
-    /**
-     * @var ITestStorage
-     */
-    protected $storage;
+    protected MockStorage $storage;
 
     /**
      *
      */
     public function setUp(): void
     {
-        // detect version of nette istorage
-        $this->storage = (new \ReflectionMethod(IStorage::class, 'read'))->getParameters()[0]->hasType() ?
-            new TestStorage3 :
-            new TestStorage2;
+        $this->storage = new MockStorage();
     }
 
     /**
@@ -58,7 +49,7 @@ class CacheTest extends TestCase
      */
     public function testSuccessGetItem()
     {
-        $this->storage->setData($this->getDefaultDataArray());
+        $this->storage->data = $this->getDefaultDataArray();
         $cache = new Cache($this->storage);
         $item = $cache->getItem('key2');
         Assert::true($item->isHit());
@@ -75,7 +66,7 @@ class CacheTest extends TestCase
         $item = $cache->getItem('key2');
         $item->set('defaultX');
         $cache->save($item);
-        Assert::same($this->getDefaultDataArray(), $this->storage->getData());
+        Assert::same($this->getDefaultDataArray(), $this->storage->data);
     }
 
     /**
@@ -88,7 +79,7 @@ class CacheTest extends TestCase
         $item->set('defaultX');
         $cache->saveDeferred($item);
         unset($cache);
-        Assert::equal($this->getDefaultDataArray(), $this->storage->getData());
+        Assert::equal($this->getDefaultDataArray(), $this->storage->data);
     }
 
     /**
@@ -100,7 +91,7 @@ class CacheTest extends TestCase
         $item = $cache->getItem('key2');
         $item->set('defaultX');
         unset($cache);
-        Assert::same([], $this->storage->getData());
+        Assert::same([], $this->storage->data);
     }
 
     /**
@@ -124,7 +115,7 @@ class CacheTest extends TestCase
      */
     public function testDeleteItem(): void
     {
-        $this->storage->setData($this->getDefaultDataArray());
+        $this->storage->data = $this->getDefaultDataArray();
         $cache = new Cache($this->storage);
 
         $item = $cache->getItem('key2');
@@ -172,7 +163,7 @@ class CacheTest extends TestCase
         Assert::false($items['key2']->isHit());
 
         $cache2->clear();
-        Assert::equal([], $this->storage->getData());
+        Assert::equal([], $this->storage->data);
     }
 
     public function testInvalidSave(): void
@@ -181,28 +172,34 @@ class CacheTest extends TestCase
 
         $item = new class implements CacheItemInterface
         {
-            public function getKey()
+            public function getKey(): string
             {
+                return '';
             }
 
-            public function get()
+            public function get(): mixed
             {
+                return null;
             }
 
-            public function isHit()
+            public function isHit(): bool
             {
+                return false;
             }
 
-            public function set($value)
+            public function set(mixed $value): static
             {
+                return $this;
             }
 
-            public function expiresAt($expiration)
+            public function expiresAt(?\DateTimeInterface $expiration): static
             {
+                return $this;
             }
 
-            public function expiresAfter($time)
+            public function expiresAfter(\DateInterval|int|null $time): static
             {
+                return $this;
             }
         };
 
@@ -217,11 +214,7 @@ class CacheTest extends TestCase
     {
         $cache = new Cache($this->storage);
         Assert::exception(function () use ($cache) {
-            $cache->getItems([-1]);
-        }, InvalidArgumentException::class);
-
-        Assert::exception(function () use ($cache) {
-            $cache->getItems([(object) ['hello']]);
+            $cache->getItems(['']);
         }, InvalidArgumentException::class);
 
         Assert::exception(function () use ($cache) {

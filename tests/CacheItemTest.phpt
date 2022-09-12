@@ -22,10 +22,7 @@ require __DIR__ . '/bootstrap.php';
  */
 class CacheItemTest extends TestCase
 {
-    /**
-     * @var CacheItem
-     */
-    protected $item;
+    protected CacheItem $item;
 
     /**
      *
@@ -34,11 +31,11 @@ class CacheItemTest extends TestCase
     {
         $this->item = new class extends CacheItem
         {
-            protected $key = 'key';
-            protected $value = 3.14;
-            protected $isHit = false;
-            protected $expiry = 100;
-            protected $defaultLifetime = 111;
+            protected string $key = 'key';
+            protected mixed $value = 3.14;
+            protected bool $isHit = false;
+            protected ?int $expiry = 100;
+            protected int $defaultLifetime = 111;
         };
     }
 
@@ -71,21 +68,6 @@ class CacheItemTest extends TestCase
 
         $item->expiresAfter(100);
         Assert::same((int)$now->modify('+100 second')->format('U'), $item->getExpiry());
-    }
-
-    /**
-     *
-     */
-    public function testExceptions(): void
-    {
-        $item = $this->item;
-        Assert::exception(function () use ($item) {
-            $item->expiresAt(100);
-        }, InvalidArgumentException::class);
-
-        Assert::exception(function () use ($item) {
-            $item->expiresAfter(new \DateTime);
-        }, InvalidArgumentException::class);
     }
 }
 

@@ -6,15 +6,14 @@
  * For the full copyright and license information, please view the LICENSE file.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace FreezyBee\NetteCachingPsr6;
 
 use Closure;
 use FreezyBee\NetteCachingPsr6\Exception\InvalidArgumentException;
-use Nette\Caching\IStorage;
 use Nette\Caching\Cache as NetteCache;
-use Nette\InvalidArgumentException as NetteArgumentException;
+use Nette\Caching\Storage;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -23,20 +22,12 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class Cache implements CacheItemPoolInterface
 {
-    /** @var NetteCache */
-    protected $netteCache;
-
     /** @var CacheItem[] */
-    protected $deferred;
+    protected array $deferred = [];
+    protected NetteCache $netteCache;
+    protected Closure $createCacheItem;
 
-    /** @var Closure */
-    protected $createCacheItem;
-
-    /**
-     * @param IStorage $storage
-     * @param string $namespace
-     */
-    public function __construct(IStorage $storage, string $namespace = null)
+    public function __construct(Storage $storage, string $namespace = null)
     {
         $this->netteCache = new NetteCache($storage, $namespace);
 
@@ -46,7 +37,6 @@ class Cache implements CacheItemPoolInterface
                 $item->key = $key;
                 $item->value = $value;
                 $item->isHit = $isHit;
-                $item->defaultLifetime = 3600;
 
                 return $item;
             },
@@ -55,10 +45,7 @@ class Cache implements CacheItemPoolInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getItem($key): CacheItem
+    public function getItem(string $key): CacheItem
     {
         self::validateKey($key);
 
@@ -70,9 +57,10 @@ class Cache implements CacheItemPoolInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
+     * @return iterable<mixed>
      */
-    public function getItems(array $keys = [])
+    public function getItems(array $keys = []): iterable
     {
         foreach ($keys as $key) {
             self::validateKey($key);
@@ -89,34 +77,25 @@ class Cache implements CacheItemPoolInterface
         return $items;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasItem($key): bool
+    public function hasItem(string $key): bool
     {
         return $this->getItem($key)->isHit();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(): bool
     {
         $this->deferred = [];
-        $this->netteCache->clean([NetteCache::ALL]);
+        $this->netteCache->clean([NetteCache::ALL => true]);
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteItem($key): bool
+    public function deleteItem(string $key): bool
     {
         return $this->deleteItems([$key]);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteItems(array $keys): bool
     {
@@ -132,9 +111,6 @@ class Cache implements CacheItemPoolInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(CacheItemInterface $item): bool
     {
         if (!$item instanceof CacheItem) {
@@ -145,9 +121,6 @@ class Cache implements CacheItemPoolInterface
         return $this->commit();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveDeferred(CacheItemInterface $item): bool
     {
         if (!$item instanceof CacheItem) {
@@ -158,9 +131,6 @@ class Cache implements CacheItemPoolInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function commit(): bool
     {
         foreach ($this->deferred as $item) {
@@ -170,9 +140,6 @@ class Cache implements CacheItemPoolInterface
         return true;
     }
 
-    /**
-     * @throws NetteArgumentException
-     */
     public function __destruct()
     {
         if ($this->deferred) {
@@ -180,19 +147,8 @@ class Cache implements CacheItemPoolInterface
         }
     }
 
-    /**
-     * Validates a cache key according to PSR-6.
-     * @param mixed $key The key to validate
-     * @throws InvalidArgumentException When $key is not valid.
-     */
-    public static function validateKey($key): void
+    public static function validateKey(string $key): void
     {
-        if (!is_string($key)) {
-            throw new InvalidArgumentException(sprintf(
-                'Cache key must be string, "%s" given',
-                is_object($key) ? get_class($key) : gettype($key)
-            ));
-        }
         if (!isset($key[0])) {
             throw new InvalidArgumentException('Cache key length must be greater than zero');
         }
