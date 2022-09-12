@@ -10,7 +10,7 @@ PSR-6 Bridge for Nette Caching.
 Requirements
 ------------
 
-FreezyBee/NetteCachingPsr6 requires PHP 7.0 or higher
+FreezyBee/NetteCachingPsr6 requires PHP 8 + Nette 3
 
 
 Installation
