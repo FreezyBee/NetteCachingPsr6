@@ -17,15 +17,15 @@
     }
   ],
   "require": {
-    "php": "^8.0",
+    "php": "^8.5",
     "nette/caching": "^3.0",
-    "psr/cache": "^1.0 | ^2.0 | ^3.0"
+    "psr/cache": "^3.0"
   },
   "require-dev": {
     "nette/tester": "~2.0",
     "tracy/tracy": "^2.4",
-    "phpstan/phpstan": "^1.8",
-    "squizlabs/php_codesniffer": "^3.0"
+    "phpstan/phpstan": "^2.0",
+    "squizlabs/php_codesniffer": "^4.0"
   },
   "autoload": {
     "psr-4": {

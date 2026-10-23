@@ -27,7 +27,7 @@ class Cache implements CacheItemPoolInterface
     protected NetteCache $netteCache;
     protected Closure $createCacheItem;
 
-    public function __construct(Storage $storage, string $namespace = null)
+    public function __construct(Storage $storage, ?string $namespace = null)
     {
         $this->netteCache = new NetteCache($storage, $namespace);
 
@@ -67,7 +67,7 @@ class Cache implements CacheItemPoolInterface
         }
 
         $items = [];
-        $rawItems = $this->netteCache->bulkLoad($keys);
+        $rawItems = $this->netteCache->bulkLoad(array_values($keys));
         $f = $this->createCacheItem;
 
         foreach ($rawItems as $key => $value) {
